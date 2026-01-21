@@ -57,21 +57,7 @@
 </head>
 
 <body>
-
-    <!-- Loading Screen -->
-    <div id="loading-screen">welcome</div>
-    <script>
-        (function () {
-            const words = ["welcome", "hi", "hello", "sup", "ayo", "privetiki", "oi"];
-            const word = words[Math.floor(Math.random() * words.length)];
-            const el = document.getElementById('loading-screen');
-            el.innerText = word;
-
-            // Random vibrant color
-            const hue = Math.floor(Math.random() * 360);
-            el.style.color = `hsl(${hue}, 70%, 45%)`;
-        })();
-    </script>
+    <div id="loading-screen" class="hidden"></div>
 
     <div id="overlay"></div>
 

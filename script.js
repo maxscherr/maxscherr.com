@@ -7,18 +7,41 @@ window.addEventListener('load', () => {
     randomizeButtonColor();
     setupSocialInteractions();
 
-    // Hide Loading Screen on full load
-    const loader = document.getElementById('loading-screen');
-    if (loader) {
-        // Force a minimum time? No, user wants "only until the whole site loads".
-        // But let's give it a tiny buffer so it doesn't flash if instant.
-        // Actually simple is best as requested.
-        loader.classList.add('hidden');
+    // LOADING SCREEN LOGIC
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+        // Fade out
+        loadingScreen.style.opacity = '0';
         setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500); // Wait for transition
+            loadingScreen.classList.add('hidden');
+        }, 500);
+        // Mark as visited
+        sessionStorage.setItem('hasVisited', 'true');
     }
 });
+
+// INITIALIZE LOADING SCREEN (Run immediately)
+(function initLoadingScreen() {
+    const hasVisited = sessionStorage.getItem('hasVisited');
+    const loadingScreen = document.getElementById('loading-screen');
+
+    if (hasVisited) {
+        // Already visited this session -> Hide immediately
+        if (loadingScreen) loadingScreen.classList.add('hidden');
+    } else {
+        // First visit -> Show random word
+        if (loadingScreen) {
+            loadingScreen.classList.remove('hidden');
+
+            const words = ['welcome', 'hi', 'hello', 'sup', 'ayo', 'privetiki', 'oi'];
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+
+            loadingScreen.innerText = randomWord;
+            loadingScreen.style.color = randomColor;
+        }
+    }
+})();
 
 function scrambleItems() {
     // 1. Setup Matter.js aliases
