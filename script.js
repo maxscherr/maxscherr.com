@@ -6,20 +6,6 @@ window.addEventListener('load', () => {
     arrangeGrid();
     randomizeButtonColor();
     setupSocialInteractions();
-
-    // Hide loading screen
-    const loader = document.getElementById('loading-screen');
-    // Check if it was already hidden by the inline script (reload/subsequent visit)
-    if (loader && loader.style.display !== 'none') {
-        setTimeout(() => {
-            loader.style.transition = 'opacity 0.5s ease';
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                sessionStorage.setItem('introShown', 'true');
-            }, 500);
-        }, 2000); // 2 seconds
-    }
 });
 
 function scrambleItems() {

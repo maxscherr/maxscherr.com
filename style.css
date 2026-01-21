@@ -528,11 +528,3 @@ body {
 .easter-egg-msg.visible {
     opacity: 1;
 }
-
-/* 10. LOADING SCREEN */
-#loading-screen img {
-    width: 600px;
-    max-width: 90vw;
-    height: auto;
-    object-fit: contain;
-}
