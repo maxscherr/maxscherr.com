@@ -667,8 +667,7 @@ function setupSocialInteractions() {
             }
         });
 
-        // 2. Hover to Pause (Makes clicking easier)
-        btn.addEventListener('mouseenter', () => {
+        const freezeBody = () => {
             if (btn.classList.contains('floating') && engine && engine.world) {
                 const bodies = Matter.Composite.allBodies(engine.world);
                 const body = bodies.find(b => b.plugin && b.plugin.domElement === btn);
@@ -677,9 +676,9 @@ function setupSocialInteractions() {
                     Matter.Body.setStatic(body, true);
                 }
             }
-        });
+        };
 
-        btn.addEventListener('mouseleave', () => {
+        const unfreezeBody = () => {
             if (btn.classList.contains('floating') && engine && engine.world && btn.style.display !== 'none') {
                 const bodies = Matter.Composite.allBodies(engine.world);
                 const body = bodies.find(b => b.plugin && b.plugin.domElement === btn);
@@ -694,7 +693,17 @@ function setupSocialInteractions() {
                     });
                 }
             }
-        });
+        };
+
+        // 2. Hover/Touch to Pause (Makes clicking easier)
+        btn.addEventListener('mouseenter', freezeBody);
+        btn.addEventListener('touchstart', (e) => {
+            // passive true to allow scroll if needed, though these are fixed
+            freezeBody();
+        }, { passive: true });
+
+        btn.addEventListener('mouseleave', unfreezeBody);
+        btn.addEventListener('touchend', unfreezeBody);
     });
 }
 
