@@ -5,6 +5,21 @@ let engine, runner, render, composite, walls = [];
 window.addEventListener('load', () => {
     arrangeGrid();
     randomizeButtonColor();
+    setupSocialInteractions();
+
+    // Hide loading screen
+    const loader = document.getElementById('loading-screen');
+    // Check if it was already hidden by the inline script (reload/subsequent visit)
+    if (loader && loader.style.display !== 'none') {
+        setTimeout(() => {
+            loader.style.transition = 'opacity 0.5s ease';
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                sessionStorage.setItem('introShown', 'true');
+            }, 500);
+        }, 2000); // 2 seconds
+    }
 });
 
 function scrambleItems() {
@@ -300,6 +315,7 @@ function loadFilm(element) {
         });
         hls.loadSource(videoUrl);
         hls.attachMedia(video);
+        video.hls = hls; // Store HLS instance for cleanup
 
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
             video.play().catch(e => console.log("Autoplay blocked/failed", e));
@@ -500,6 +516,13 @@ function closeAll(ignoreElement = null) {
             const container = item.querySelector('.video-container');
             const thumbnail = item.querySelector('.thumbnail');
 
+            // Clean up video properly to prevent audio lingering
+            const video = container.querySelector('video');
+            if (video) {
+                video.pause();
+                if (video.hls) video.hls.destroy();
+            }
+
             // Wipe the video player entirely to save memory/bandwidth
             container.innerHTML = "";
             container.style.display = 'none';
@@ -511,6 +534,9 @@ function closeAll(ignoreElement = null) {
     overlay.style.backgroundColor = '';
     // Reset buttons visibility
     document.querySelectorAll('.social-btn, #return-btn').forEach(b => b.style.opacity = '');
+
+    // Easter Egg Check
+    checkEasterEgg();
 
     // If we are in grid mode, we need to restore the layout sizing for the items
     // (Since we stripped it in focusMe)
@@ -525,6 +551,7 @@ overlay.addEventListener('click', () => closeAll());
 // DISCO MODE LOGIC
 let discoInterval;
 const vibrantColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF8F33', '#33FFF5', '#8F33FF', '#F533FF', '#FFF533'];
+let isEasterEggReady = false; // Flag to track if all items are gone
 
 function startDiscoMode() {
     clearInterval(discoInterval);
@@ -542,9 +569,26 @@ function stopDiscoMode() {
     clearInterval(discoInterval);
     document.body.style.transition = "background-color 0.5s ease";
     document.body.style.backgroundColor = "#ffffff";
+
+    // Hide easter egg message if visible
+    const msg = document.getElementById('easter-egg-msg');
+    if (msg) msg.classList.remove('visible');
+    isEasterEggReady = false;
 }
 
 function toggleLayout() {
+    // SPECIAL EASTER EGG CASE: If ready, clicking this button makes it disappear + shows final message
+    if (isEasterEggReady) {
+        const btn = document.getElementById('return-btn');
+        btn.style.display = 'none'; // Poof
+
+        const msg = document.getElementById('easter-egg-msg');
+        if (msg) {
+            msg.innerText = "email me with the word site easter egg";
+        }
+        return; // Stop normal toggle
+    }
+
     randomizeButtonColor();
     const btn = document.getElementById('return-btn');
     // Check uppercase because CSS text-transform might affect innerText or just to be safe
@@ -580,6 +624,92 @@ function randomizeButtonColor() {
     if (btn) btn.style.backgroundColor = toHSL(hue2);
     // Right button gets the third color
     if (emailBtn) emailBtn.style.backgroundColor = toHSL(hue3);
+}
+
+function setupSocialInteractions() {
+    const socialBtns = document.querySelectorAll('.social-btn');
+    socialBtns.forEach(btn => {
+        // 1. Click to Disappear
+        btn.addEventListener('click', (e) => {
+            // Only active in Disco Mode (floating)
+            if (btn.classList.contains('floating')) {
+                e.preventDefault();
+                btn.style.display = 'none';
+
+                if (engine && engine.world) {
+                    const bodies = Matter.Composite.allBodies(engine.world);
+                    const body = bodies.find(b => b.plugin && b.plugin.domElement === btn);
+                    if (body) Matter.Composite.remove(engine.world, body);
+                }
+
+                checkEasterEgg();
+            }
+        });
+
+        // 2. Hover to Pause (Makes clicking easier)
+        btn.addEventListener('mouseenter', () => {
+            if (btn.classList.contains('floating') && engine && engine.world) {
+                const bodies = Matter.Composite.allBodies(engine.world);
+                const body = bodies.find(b => b.plugin && b.plugin.domElement === btn);
+                if (body) {
+                    // Freeze it nicely
+                    Matter.Body.setStatic(body, true);
+                }
+            }
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            if (btn.classList.contains('floating') && engine && engine.world && btn.style.display !== 'none') {
+                const bodies = Matter.Composite.allBodies(engine.world);
+                const body = bodies.find(b => b.plugin && b.plugin.domElement === btn);
+                if (body) {
+                    // Unfreeze
+                    Matter.Body.setStatic(body, false);
+                    Matter.Body.setSleeping(body, false);
+                    // Give it a gentle push so it resumes naturally
+                    Matter.Body.setVelocity(body, {
+                        x: (Math.random() - 0.5) * 4,
+                        y: (Math.random() - 0.5) * 4
+                    });
+                }
+            }
+        });
+    });
+}
+
+function checkEasterEgg() {
+    // Only valid in Disco Mode
+    if (document.querySelector('.gallery.return-to-form')) return;
+
+    // Check visibility of all items and social buttons
+    const items = document.querySelectorAll('.item');
+    const socialBtns = document.querySelectorAll('.social-btn');
+
+    let visibleCount = 0;
+
+    items.forEach(el => {
+        if (el.style.display !== 'none') visibleCount++;
+    });
+
+    socialBtns.forEach(el => {
+        if (el.style.display !== 'none') visibleCount++;
+    });
+
+    if (visibleCount === 0) {
+        // TRIGGER "CONGRATS"
+        isEasterEggReady = true;
+
+        const msg = document.getElementById('easter-egg-msg');
+        if (msg) {
+            msg.innerText = "congrats";
+            msg.classList.add('visible');
+            msg.style.zIndex = "9999";
+        }
+
+        // Ensure Return to Form button is visible (it should be)
+        const retBtn = document.getElementById('return-btn');
+        if (retBtn) retBtn.style.display = 'block';
+    }
 }
 
 function arrangeGrid() {

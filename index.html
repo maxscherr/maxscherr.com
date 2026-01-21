@@ -4,14 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Gallery Portfolio</title>
+    <title>Max Scherr's Website</title>
     <link rel="preconnect" href="https://f005.backblazeb2.com">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="stylesheet" href="style.css">
+    <script>
+        function updateDynamicFavicon() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+
+            // 1. Choose a random shape and color
+            const shapes = ['circle', 'square', 'triangle', 'rectangle'];
+            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+            const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`; // Random bright color
+
+            ctx.fillStyle = randomColor;
+
+            // 2. Draw the selected shape
+            if (randomShape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(32, 32, 30, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (randomShape === 'square') {
+                ctx.fillRect(4, 4, 56, 56);
+            } else if (randomShape === 'rectangle') {
+                ctx.fillRect(4, 16, 56, 32);
+            } else if (randomShape === 'triangle') {
+                ctx.beginPath();
+                ctx.moveTo(32, 4);  // Top
+                ctx.lineTo(60, 60); // Bottom Right
+                ctx.lineTo(4, 60);  // Bottom Left
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // 3. Update the favicon link in the HTML
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = canvas.toDataURL();
+        }
+
+        // Run the function as soon as the page loads
+        window.onload = updateDynamicFavicon;
+    </script>
 </head>
 
 <body>
+
+    <!-- Loading Screen -->
+    <!-- Loading Screen -->
+    <div id="loading-screen"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center;">
+        <img src="assets/intro/cars.gif" alt="Loading...">
+    </div>
+    <script>
+        // Immediately hide if already visited in this session
+        if (sessionStorage.getItem('introShown')) {
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+    </script>
 
     <div id="overlay"></div>
 
@@ -26,6 +84,9 @@
 
     <!-- Return to Form button -->
     <button id="return-btn" onclick="toggleLayout()">Lose Form</button>
+
+    <!-- Hidden Easter Egg Message -->
+    <div id="easter-egg-msg" class="easter-egg-msg">congrats</div>
 
     <div class="gallery">
 
