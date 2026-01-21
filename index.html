@@ -1,27 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Your Name</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Gallery Portfolio</title>
+    <link rel="preconnect" href="https://f005.backblazeb2.com">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <main>
-    <h1>Your Name</h1>
 
-    <p class="essay">
-      This is your first text. Treat it like a page from a book.
-    </p>
+    <div id="overlay"></div>
 
-    <img src="media/photo1.jpg" alt="photo" />
+    <!-- Social Buttons -->
+    <a href="https://instagram.com/maxscherr" target="_blank" class="social-btn" id="insta-btn">
+        <img src="assets/icons/instagram.svg" alt="Instagram">
+    </a>
 
-    <video controls width="600">
-      <source src="media/video1.mp4" type="video/mp4" />
-    </video>
+    <a href="mailto:work@maxscherr.com" class="social-btn" id="email-btn">
+        <img src="assets/icons/email.svg" alt="Email">
+    </a>
 
-    <p class="essay">
-      Another paragraph. Another thought.
-    </p>
-  </main>
+    <!-- Return to Form button -->
+    <button id="return-btn" onclick="toggleLayout()">Lose Form</button>
+
+    <div class="gallery">
+
+        <div class="item" onclick="focusMe(this)">
+            <img src="photos/godard-1.jpg" alt="Artwork">
+            <div class="caption">Max Scherr replicating the iconic image of Jean-Luc Godard in the year 2025</div>
+        </div>
+
+        <div class="item" onclick="focusMe(this)">
+            <img src="photos/blinmondo-3.png" alt="Artwork">
+            <div class="caption">Oleg Blinov replicating the iconic image of Jean-Paul Belmondo in the year 2025</div>
+        </div>
+
+        <div class="item" onclick="loadAndFocus(this, 'essays/return-to-form.txt')">
+            <div class="essay-box">
+                <h2 class="essay-title">"Return to Form"</h2>
+                <p class="essay-content"></p>
+            </div>
+        </div>
+
+        <div class="item film-item"
+            data-video-src="https://f005.backblazeb2.com/file/maxscherr-com/b4f-teaser-m3u8/index.m3u8"
+            onclick="loadFilm(this)">
+            <img src="thumbs/b4f-teaser-thumb.gif" class="thumbnail">
+            <div class="video-container"></div>
+            <div class="caption">BORIS 4 FREEDOM, a trailer for a feature film from the year 2026</div>
+        </div>
+
+        <div class="item film-item"
+            data-video-src="https://f005.backblazeb2.com/file/maxscherr-com/hodge-podge-h264-m3u8/index.m3u8"
+            onclick="loadFilm(this)">
+            <img src="thumbs/hodge-podge-teaser-thumb.gif" class="thumbnail">
+            <div class="video-container"></div>
+            <div class="caption">Hodge-Podge, a short film from the year 2025</div>
+        </div>
+
+        <div class="item film-item"
+            data-video-src="https://f005.backblazeb2.com/file/maxscherr-com/volna-m3u8/index.m3u8"
+            onclick="loadFilm(this)">
+            <img src="thumbs/volna-thumb.gif" class="thumbnail">
+            <div class="video-container"></div>
+            <div class="caption">Daite Tank (!) - Volna, a music video from the year 2019</div>
+        </div>
+
+        <div class="item" onclick="focusMe(this)">
+            <img src="photos/b4f-poster-1.jpg" alt="Artwork">
+            <div class="caption">BORIS 4 FREEDOM, a principal poster for a feature film from the year 2026</div>
+        </div>
+
+        <div class="item" onclick="focusMe(this)">
+            <img src="photos/cacti.jpg" alt="Artwork">
+            <div class="caption">Two cacti in Joshua Tree</div>
+        </div>
+
+        <div class="item" onclick="focusMe(this)">
+            <img src="photos/alcatraz.jpg" alt="Artwork">
+            <div class="caption">Prison is life</div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
 </body>
+
 </html>

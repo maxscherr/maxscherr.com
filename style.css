@@ -1,45 +1,508 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.3">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
-</head>
-<body>
-<p class="p1"><span class="s1">body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: #0e0e0e;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #eaeaea;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-family: Georgia, serif;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>line-height: 1.6;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">main {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 700px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 80px auto;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 0 20px;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">h1 {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 48px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: 40px;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.essay {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: 40px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 18px;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">img, video {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: block;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 40px 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 100%;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-</body>
-</html>
+/* 1. FONT SETUP */
+@font-face {
+    font-family: 'Gotham';
+    /* If your file is .otf, use format('opentype'). If .ttf, use format('truetype') */
+    src: url('assets/fonts/Gotham-Bold.TTF') format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'Gotham';
+    /* Do the same for the Medium weight */
+    src: url('assets/fonts/Gotham-Medium.otf') format('opentype');
+    font-weight: 500;
+}
+
+/* 2. GENERAL LAYOUT */
+body {
+    background-color: white;
+    margin: 0;
+    font-family: 'Gotham', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    /* Near white for gallery feel */
+    z-index: 500;
+    cursor: zoom-out;
+}
+
+#overlay.active {
+    display: block;
+}
+
+.gallery {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 3. ITEM STYLES */
+/* Bouncy Hover Effect for media */
+.item img,
+.item video,
+.essay-box {
+    /* transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); Standard bouncy */
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* More pronounced pop */
+}
+
+/* Apply scale on hover, but NOT when the item is focused (full screen) */
+.item:not(.is-focused):hover img,
+.item:not(.is-focused):hover video,
+.item:not(.is-focused):hover .essay-box {
+    transform: scale(1.08);
+    /* Slightly bigger */
+}
+
+.item {
+    position: absolute;
+    cursor: pointer;
+    z-index: 1;
+    transition: transform 0.5s ease, top 0.5s ease, left 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+
+.item img,
+.item video {
+    display: block;
+    max-width: 280px;
+    height: auto;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.essay-box {
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    max-width: 250px;
+    border-radius: 4px;
+}
+
+.essay-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+}
+
+.essay-content {
+    display: none;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-top: 20px;
+}
+
+/* 4. ANIMATIONS */
+@keyframes float1 {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, 40px);
+    }
+}
+
+@keyframes float2 {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(-40px, 20px);
+    }
+}
+
+.item:nth-child(odd) {
+    animation: float1 10s infinite ease-in-out;
+}
+
+.item:nth-child(even) {
+    animation: float2 13s infinite ease-in-out;
+}
+
+/* Floating Social Buttons override */
+.social-btn.floating {
+    position: absolute !important;
+    animation: float1 10s infinite ease-in-out;
+    z-index: 50;
+    /* Ensure they mix with items but below focused */
+}
+
+.social-btn.floating:nth-child(even) {
+    animation: float2 13s infinite ease-in-out;
+}
+
+/* 5. FOCUS STATE (The Big View) */
+.item.is-focused {
+    animation: none !important;
+    position: fixed;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000;
+    opacity: 1 !important;
+}
+
+/* Ensure images/videos grow to fit the screen */
+.item.is-focused img,
+.item.is-focused video {
+    max-width: 85vw;
+    max-height: 80vh;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+}
+
+.item.is-focused .essay-box {
+    max-width: 600px;
+}
+
+.item.is-focused .essay-content {
+    display: block;
+}
+
+.video-container {
+    display: none;
+    /* Hidden until loadFilm is called */
+    width: 100%;
+}
+
+.item.is-focused .video-container {
+    display: block;
+}
+
+/* Return to Form button */
+#return-btn {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1200;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 15px 20px;
+    /* Larger padding */
+    font-weight: 700;
+    font-size: 1.1rem;
+    /* Larger text */
+    text-transform: uppercase;
+    /* Capitalize */
+    cursor: pointer;
+    border-radius: 3px;
+    font-family: 'Gotham', sans-serif;
+    transition: background-color 0.3s ease;
+    /* Smooth color transition */
+    text-align: center;
+    /* Centralize text */
+    white-space: nowrap;
+    /* Prevent wrapping */
+}
+
+/* Social Buttons */
+.social-btn {
+    position: fixed;
+    top: 18px;
+    z-index: 1200;
+    width: 40px;
+    height: 40px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.social-btn:hover {
+    transform: scale(1.05);
+}
+
+.social-btn img {
+    width: 30px;
+    height: 30px;
+    filter: invert(1);
+    /* Make icons white if they are black. Assuming SVGs are black or use simple shape */
+    display: block;
+}
+
+#insta-btn {
+    left: 18px;
+    /* Opposite side (Top Left) */
+}
+
+#email-btn {
+    right: 18px;
+    /* Top Right */
+}
+
+/* Grid / column layout for "Return to Form" state */
+/* Grid / column layout for "Return to Form" state */
+/* Grid / column layout for "Return to Form" state */
+.gallery.return-to-form {
+    display: flex;
+    flex-direction: column;
+    /* Stack for scrolling safety */
+    /* Removed center justify/align to prevent top clipping */
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: 120px;
+    /* Safe buffer from fixed top buttons */
+    padding-bottom: 60px;
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.grid-container {
+    /* Flex Layout - Organic Packing (Cloud/Blob shape) */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* Center items horizontally */
+    align-items: flex-end;
+    /* Align items to BOTTOM of row so they sit on the next row */
+    gap: 12px;
+    /* Tight consistent gap */
+    width: 100%;
+    max-width: 1050px;
+    /* Constrain width to force a "chunkier" cloud shape */
+    margin: auto;
+    /* Vertically center safely (if space) */
+}
+
+/* Base item style in grid */
+/* Base item style in grid */
+.gallery.return-to-form .item {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    /* Remove !important from transform so hover effects can work, but default to none */
+    transform: none;
+    animation: none !important;
+    opacity: 1 !important;
+    margin: 0;
+    z-index: 1;
+    /* Base layer */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Bouncy */
+
+    /* Let items define their own size, but constrain slightly so they pack well */
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+
+    background: transparent;
+    overflow: visible;
+    display: block;
+}
+
+/* Ensure hovered items pop to the front (BUT NOT IF FOCUSED) */
+.gallery.return-to-form .item:not(.is-focused):hover {
+    z-index: 100 !important;
+    transform: scale(1.05);
+    /* Bouncy pop */
+}
+
+/* Make content preserve aspect ratio but limit size so they pack nicely */
+/* Make content preserve aspect ratio but limit size so they pack nicely */
+.gallery.return-to-form .item img,
+.gallery.return-to-form .item video {
+    display: block;
+    width: auto;
+    /* Height will be calculated by JS for smart layout */
+    height: auto;
+    max-width: 100%;
+    /* Ensure they don't overflow screen width */
+    object-fit: contain;
+    /* or cover if you want them full, but user said 'raw resolution' */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Subtle floaty shadow */
+}
+
+/* Adjust essay box for grid */
+.gallery.return-to-form .essay-box {
+    background: transparent;
+    /* Invisible tile as requested */
+    box-shadow: none;
+    /* No shadow/outline */
+    border: none;
+    padding: 0 50px;
+    /* Significant side padding to separate text from neighbors */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: auto;
+    /* Let JS determine width/height via flex/inline-style if needed, or natural width */
+    max-width: none;
+    /* Override global max-width constraint causing clipping */
+    box-sizing: border-box;
+    /* ensure padding is inside height */
+}
+
+/* Expanded Essay Style - override grid transparency */
+/* Expanded Essay Style - override grid transparency GLOBAL */
+.item.is-focused .essay-box {
+    background: #fff !important;
+    width: 90vw !important;
+    max-width: 800px !important;
+    height: 80vh !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    display: block !important;
+    text-align: left;
+    padding: 60px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    cursor: default;
+    /* Text cursor */
+}
+
+/* Ensure title inside expanded essay looks good */
+.item.is-focused .essay-title {
+    margin-bottom: 30px;
+    white-space: normal !important;
+    /* Allow wrapping in full view */
+    font-size: 2em;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    color: #000;
+}
+
+.item.is-focused .essay-content {
+    display: block !important;
+    line-height: 1.8;
+    font-size: 1.1em;
+    color: #333;
+    opacity: 1;
+}
+
+/* Ensure essay titles don't wrap in grid mode */
+.gallery.return-to-form .essay-box h2,
+/* Assuming h2 based on common patterns, check index.html if needed */
+.gallery.return-to-form .essay-title {
+    white-space: nowrap;
+    font-size: 2rem;
+    /* Ensure it's legible but fits */
+    margin: 0;
+    line-height: 1;
+}
+
+/* Focus override - Pop out! */
+.item.is-focused,
+.gallery.return-to-form .item.is-focused {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: auto !important;
+    transform: none !important;
+    /* FLIP animation target */
+    width: fit-content;
+    height: fit-content;
+    z-index: 2000;
+
+    /* Center text/image relative to each other */
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gallery.return-to-form .item.is-focused img,
+.gallery.return-to-form .item.is-focused video {
+    max-width: 85vw;
+    max-height: 80vh;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* 7. CAPTIONS */
+.caption {
+    display: none;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    color: #000;
+    max-width: 85vw;
+    /* Ensure text is legible on color background */
+    text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
+}
+
+.item.is-focused .caption {
+    display: block;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 0.3s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* 8. MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+
+    /* Thumbnail / Small States */
+    .item img,
+    .item video {
+        max-width: 140px;
+        /* Reduce size to allow movement */
+    }
+
+    .essay-box {
+        max-width: 120px;
+        /* Reduce size */
+        padding: 15px;
+        /* Reduce padding */
+    }
+
+    .essay-title {
+        font-size: 1rem;
+        /* Reduce text size */
+    }
+
+    /* FOCUSED / EXPANDED STATES */
+    .item.is-focused .essay-box {
+        box-sizing: border-box !important;
+        /* Ensure padding is included in width */
+        width: 90vw !important;
+        /* Use almost full width on mobile */
+        max-width: none !important;
+        height: auto !important;
+        max-height: 80vh !important;
+        padding: 20px !important;
+        /* Further reduce padding */
+        overflow-y: auto !important;
+    }
+
+    .item.is-focused .essay-title {
+        font-size: 1.2rem !important;
+        /* Smaller title */
+        margin-bottom: 10px;
+    }
+
+    .item.is-focused .essay-content {
+        font-size: 0.95rem !important;
+        /* Readable body text */
+        line-height: 1.4;
+    }
+}
