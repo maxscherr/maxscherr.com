@@ -525,6 +525,26 @@ body {
     width: 90%;
 }
 
-.easter-egg-msg.visible {
-    opacity: 1;
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    /* Adjusted for subtle impact, or user might want larger? 'just like this' usually implies standard text but let's make it legible */
+    font-weight: 500;
+    color: #000;
+    font-family: 'Gotham', sans-serif;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
 }

@@ -6,6 +6,18 @@ window.addEventListener('load', () => {
     arrangeGrid();
     randomizeButtonColor();
     setupSocialInteractions();
+
+    // Hide Loading Screen on full load
+    const loader = document.getElementById('loading-screen');
+    if (loader) {
+        // Force a minimum time? No, user wants "only until the whole site loads".
+        // But let's give it a tiny buffer so it doesn't flash if instant.
+        // Actually simple is best as requested.
+        loader.classList.add('hidden');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500); // Wait for transition
+    }
 });
 
 function scrambleItems() {
@@ -570,7 +582,7 @@ function toggleLayout() {
 
         const msg = document.getElementById('easter-egg-msg');
         if (msg) {
-            msg.innerText = "email me with the word site easter egg";
+            msg.innerHTML = "it's over<br>email me with the word site easter egg";
         }
         return; // Stop normal toggle
     }
