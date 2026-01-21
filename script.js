@@ -582,7 +582,7 @@ function toggleLayout() {
 
         const msg = document.getElementById('easter-egg-msg');
         if (msg) {
-            msg.innerHTML = "it's over<br>email me with the word site easter egg";
+            msg.innerText = "you did it! email me and say so";
         }
         return; // Stop normal toggle
     }
