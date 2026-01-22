@@ -19,8 +19,19 @@ body {
     margin: 0;
     font-family: 'Gotham', sans-serif;
     overflow: hidden;
-    width: 100vw;
+    /* Prevent scroll on desktop (physics mode) */
+    width: 100%;
     height: 100vh;
+    touch-action: none;
+    /* Helps prevent default touch actions like scroll/zoom on some mobile browsers */
+}
+
+/* Fix for mobile horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    position: fixed;
+    /* Lock body in place */
 }
 
 #overlay {
@@ -56,12 +67,15 @@ body {
     /* More pronounced pop */
 }
 
-/* Apply scale on hover, but NOT when the item is focused (full screen) */
-.item:not(.is-focused):hover img,
-.item:not(.is-focused):hover video,
-.item:not(.is-focused):hover .essay-box {
-    transform: scale(1.08);
-    /* Slightly bigger */
+/* Apply scale on hover ONLY on devices that support hover */
+@media (hover: hover) {
+
+    .item:not(.is-focused):hover img,
+    .item:not(.is-focused):hover video,
+    .item:not(.is-focused):hover .essay-box {
+        transform: scale(1.08);
+        /* Slightly bigger */
+    }
 }
 
 .item {
@@ -228,8 +242,10 @@ body {
     transition: transform 0.2s ease;
 }
 
-.social-btn:hover {
-    transform: scale(1.05);
+@media (hover: hover) {
+    .social-btn:hover {
+        transform: scale(1.05);
+    }
 }
 
 .social-btn img {
@@ -260,6 +276,8 @@ body {
     /* Removed center justify/align to prevent top clipping */
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
     padding-top: 120px;
     /* Safe buffer from fixed top buttons */
     padding-bottom: 60px;
@@ -279,7 +297,8 @@ body {
     gap: 12px;
     /* Tight consistent gap */
     width: 100%;
-    max-width: 1050px;
+    max-width: 100%;
+    /* Ensure it doesn't exceed parent */
     /* Constrain width to force a "chunkier" cloud shape */
     margin: auto;
     /* Vertically center safely (if space) */
@@ -311,11 +330,13 @@ body {
     display: block;
 }
 
-/* Ensure hovered items pop to the front (BUT NOT IF FOCUSED) */
-.gallery.return-to-form .item:not(.is-focused):hover {
-    z-index: 100 !important;
-    transform: scale(1.05);
-    /* Bouncy pop */
+/* Ensure hovered items pop to the front (BUT NOT IF FOCUSED) - HOVER ONLY */
+@media (hover: hover) {
+    .gallery.return-to-form .item:not(.is-focused):hover {
+        z-index: 100 !important;
+        transform: scale(1.05);
+        /* Bouncy pop */
+    }
 }
 
 /* Make content preserve aspect ratio but limit size so they pack nicely */
